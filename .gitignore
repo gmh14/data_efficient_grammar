@@ -1,0 +1,11 @@
+*.swp
+__pycache__/
+./*/__pycache__/
+
+.ipynb_checkpoints/
+.git
+.DS_store
+
+# Environments
+.env
+.venv
