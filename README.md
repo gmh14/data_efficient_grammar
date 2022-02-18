@@ -61,12 +61,13 @@ python main.py --training_data=./datasets/polymers_117.txt --motif
 Since ``Retro*`` is a major bottleneck of the training speed, we separate it from the main process, run multiple ``Retro*`` processes, and use file communication to evaluate the generated grammar during training. This is a compromise on the inefficiency of the built-in python multiprocessing package. We need to run the following command in another terminal window,
 ```bash
 conda activate retro_star_env
-bash retro_star_listener.sh
+bash retro_star_listener.sh **num_processes**
 ```
+>Note: opening multiple ``Retro*`` is EXTREMELY memory consuming. We suggest to start from using only one process by ``bash retro_star_listener.sh 1`` and monitor the memory usage, then accordingly increase the number to maximize the efficiency. We use ``35`` in the paper.
 
 After finishing the training, to kill all the generated processes related to ``Retro*``, run
 ```bash
-killall retron_star_listener
+killall retro_star_listener
 ```
 
 

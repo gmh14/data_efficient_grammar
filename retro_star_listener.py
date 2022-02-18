@@ -22,7 +22,7 @@ class Synthesisability():
                 gpu=-1,
                 starting_molecules='./retro_star/dataset/origin_dict.csv',
                 use_value_fn=True,
-                iterations=100,
+                iterations=50,
                 expansion_topk=50)
 
     def get_syn_rate(self, mol_list):
@@ -45,6 +45,7 @@ def main(proc_id, filename, output_filename):
             editable = lock(f)
             if editable:
                 lines = f.readlines()
+                num_samples = len(lines)
                 new_lines = []
                 for idx, line in enumerate(lines):
                     splitted_line = line.strip().split()
@@ -60,10 +61,9 @@ def main(proc_id, filename, output_filename):
                 fcntl.flock(f, fcntl.LOCK_UN)
         if selected_mol is None:
             continue
-        # try:
+
+        print("====Working for sample {}/{}====".format(selected_mol[0], num_samples))
         result = syn.planner.plan(selected_mol[1])
-        # except:
-        #     result = None
 
         while(True):
             with open(output_filename, 'a') as f:

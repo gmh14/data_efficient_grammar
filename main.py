@@ -43,7 +43,7 @@ def evaluate(grammar, args, metrics=['diversity', 'syn']):
             no_newly_generated_iter = 0
         else:
             no_newly_generated_iter += 1
-        if idx > args.num_generated_samples or no_newly_generated_iter > 10:
+        if idx >= args.num_generated_samples or no_newly_generated_iter > 10:
             break
 
     for _metric in metrics:
@@ -76,6 +76,7 @@ def retro_sender(generated_samples, args):
                 break
             fcntl.flock(fr, fcntl.LOCK_UN)
     num_samples = len(generated_samples)
+    print("Waiting for retro_star evaluation...")
     while(True):
         with open(args.receiver_file, 'r') as fr:
             editable = lock(fr)
@@ -129,7 +130,7 @@ def learn(smiles_list, args):
             eval_metric = evaluate(l_grammar, args, metrics=['diversity', 'syn'])
             logger.info("eval_metrics: {}".format(eval_metric))
             # Record metrics
-            R = eval_metric['diversity'] + 5 * eval_metric['syn']
+            R = eval_metric['diversity'] + 2 * eval_metric['syn']
             R_ind = R.copy()
             returns.append(R)
             log_returns.append(eval_metric)
