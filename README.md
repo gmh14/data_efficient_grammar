@@ -23,6 +23,8 @@ git clone git@github.com:gmh14/data_efficient_grammar.git
 cd data_efficient_grammar
 conda env create -f environment.yml
 conda activate DEG
+pip install -e retro_star/packages/mlp_retrosyn
+pip install -e retro_star/packages/rdchiral
 ```
 >Note: it may take a decent amount of time to build necessary wheels using conda.
 
@@ -46,14 +48,14 @@ pip install setproctitle
 For Acrylates, Chain Extenders, and Isocyanates, 
 ```bash
 conda activate DEG
-python main.py --datasets=./datasets/**dataset_path**
+python main.py --training_data=./datasets/**dataset_path**
 ```
 where ``**dataset_path**`` can be ``acrylates.txt``, ``chain_extenders.txt``, or ``isocyanates.txt``.
 
 For Polymer dataset,
 ```bash
 conda activate DEG
-python main.py --datasets=./datasets/polymers_117.txt --motif
+python main.py --training_data=./datasets/polymers_117.txt --motif
 ```
 
 Since ``Retro*`` is a major bottleneck of the training speed, we separate it from the main process, run multiple ``Retro*`` processes, and use file communication to evaluate the generated grammar during training. This is a compromise on the inefficiency of the built-in python multiprocessing package. We need to run the following command in another terminal window,
@@ -62,7 +64,7 @@ conda activate retro_star_env
 bash retro_star_listener.sh
 ```
 
-After finishing the training, to kill all the generated processes related to ``Retro*'', run
+After finishing the training, to kill all the generated processes related to ``Retro*``, run
 ```bash
 killall retron_star_listener
 ```
