@@ -56,7 +56,7 @@ conda activate DEG
 python main.py --datasets=./datasets/polymers_117.txt --motif
 ```
 
-Since ``Retro*`` is a major bottleneck of the training speed, we separate it from the main process, run multiple ``Retro*`` processes, and use file communication to evaluate the generated grammar during training. This is a compromise on the inefficiency of the built-in python multiprocessing package. We need to run the following command (could be in another terminal window, or add ``&`` to the previous command),
+Since ``Retro*`` is a major bottleneck of the training speed, we separate it from the main process, run multiple ``Retro*`` processes, and use file communication to evaluate the generated grammar during training. This is a compromise on the inefficiency of the built-in python multiprocessing package. We need to run the following command in another terminal window,
 ```bash
 conda activate retro_star_env
 bash retro_star_listener.sh
