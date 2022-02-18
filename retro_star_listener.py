@@ -22,7 +22,7 @@ class Synthesisability():
                 gpu=-1,
                 starting_molecules='./retro_star/dataset/origin_dict.csv',
                 use_value_fn=True,
-                iterations=10,
+                iterations=100,
                 expansion_topk=50)
 
     def get_syn_rate(self, mol_list):
