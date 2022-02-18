@@ -1,11 +1,17 @@
 *.swp
 __pycache__/
 ./*/__pycache__/
+./*/*/__pycache__/
 
 .ipynb_checkpoints/
 .git
 .DS_store
-./GCN/model_gin
+./*/.DS_store
+./*/*/.DS_store
+./retro_star/dataset/
+./retro_star/one_step_model/
+./retro_star/saved_models/
+./retro_star/retro_data.zip
 
 # Environments
 .env
