@@ -102,7 +102,7 @@ def learn(smiles_list, args):
     logger = logging.getLogger('global_logger')
 
     # Initialize dataset & potential function (agent) & optimizer
-    subgraph_set, input_graphs_dict = data_processing(smiles_list, args.motif)
+    subgraph_set_init, input_graphs_dict_init = data_processing(smiles_list, args.GNN_model_path, args.motif)
     agent = Agent(feat_dim=300, hidden_size=args.hidden_size)
     if args.resume:
         assert  os.path.exists(args.resume_path), "Please provide valid path for resuming."
@@ -120,29 +120,27 @@ def learn(smiles_list, args):
 
         # MCMC sampling
         for num in range(args.MCMC_size):
-            grammar = ProductionRuleCorpus()
-            all_input_graphs_dict = [deepcopy(input_graphs_dict)]
-            all_subgraph_set = [deepcopy(subgraph_set)]
-            all_grammar = [deepcopy(grammar)]
-            iter_num, all_grammar, all_input_graphs_dict = MCMC_sampling(agent, all_input_graphs_dict, all_subgraph_set, all_grammar, num, args)
+            grammar_init = ProductionRuleCorpus()
+            l_input_graphs_dict = deepcopy(input_graphs_dict_init)
+            l_subgraph_set = deepcopy(subgraph_set_init)
+            l_grammar = deepcopy(grammar_init)
+            iter_num, l_grammar, l_input_graphs_dict = MCMC_sampling(agent, l_input_graphs_dict, l_subgraph_set, l_grammar, num, args)
             # Grammar evaluation
-            eval_metrics = []
-            for _grammar in all_grammar:
-                eval_metrics.append(evaluate(_grammar, args, metrics=['diversity', 'syn']))
-            eval_metric = eval_metrics[0]
-            logger.info("eval_metrics: {}".format(eval_metrics))
-            R = eval_metric['diversity'] + 2 * eval_metric['syn']
+            eval_metric = evaluate(l_grammar, args, metrics=['diversity', 'syn'])
+            logger.info("eval_metrics: {}".format(eval_metric))
+            # Record metrics
+            R = eval_metric['diversity'] + 5 * eval_metric['syn']
             R_ind = R.copy()
             returns.append(R)
-            log_returns.append(eval_metrics)
+            log_returns.append(eval_metric)
             logger.info("======Sample {} returns {}=======:".format(num, R_ind))
             # Save ckpt
             if R_ind > curr_max_R:
                 torch.save(agent.state_dict(), os.path.join(save_log_path, 'epoch_agent_{}_{}.pkl'.format(train_epoch, R_ind)))
                 with open('{}/epoch_grammar_{}_{}.pkl'.format(save_log_path, train_epoch, R_ind), 'wb') as outp:
-                    pickle.dump(all_grammar[0], outp, pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(l_grammar, outp, pickle.HIGHEST_PROTOCOL)
                 with open('{}/epoch_input_graphs_{}_{}.pkl'.format(save_log_path, train_epoch, R_ind), 'wb') as outp:
-                    pickle.dump(all_input_graphs_dict[0], outp, pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(l_input_graphs_dict, outp, pickle.HIGHEST_PROTOCOL)
                 curr_max_R = R_ind
         
         # Calculate loss
@@ -167,10 +165,10 @@ def learn(smiles_list, args):
         logger.info("Loss: {}".format(policy_loss.clone().item()))
         eval_metrics = {}
         for r in log_returns:
-            for _key in r[0].keys():
+            for _key in r.keys():
                 if _key not in eval_metrics:
                     eval_metrics[_key] = []
-                eval_metrics[_key].append(r[0][_key])
+                eval_metrics[_key].append(r[_key])
         mean_evaluation_metrics = ["{}: {}".format(_key, np.mean(eval_metrics[_key])) for _key in eval_metrics]
         logger.info("Mean evaluation metrics: {}".format(', '.join(mean_evaluation_metrics)))
 
@@ -178,6 +176,7 @@ def learn(smiles_list, args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MCMC training')
     parser.add_argument('--training_data', type=str, default="./datasets/isocyanates.txt", help="file name of the training data")
+    parser.add_argument('--GNN_model_path', type=str, default="./GCN/model_gin/supervised_contextpred.pth", help="file name of the pretrained GNN model")
     parser.add_argument('--hidden_size', type=int, default=128, help="hidden size of the potential function")
     parser.add_argument('--max_epoches', type=int, default=20, help="maximal training epoches")
     parser.add_argument('--num_generated_samples', type=int, default=100, help="number of generated samples to evaluate grammar")
@@ -193,9 +192,13 @@ if __name__ == '__main__':
 
     # Get raw training data
     assert os.path.exists(args.training_data), "Please provide valid path of training data."
+    # Remove duplicated molecules
     with open(args.training_data, 'r') as fr:
         lines = fr.readlines()
-        mol_sml = [line.strip() for line in lines]
+        mol_sml = []
+        for line in lines:
+            if not (line.strip() in mol_sml):
+                mol_sml.append(line.strip())
 
     # Clear the communication files for Retro*
     with open(args.sender_file, 'w') as fw:

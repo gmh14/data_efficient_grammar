@@ -1,9 +1,11 @@
 import torch
 import torch.multiprocessing as mp
+import numpy as np
 from private.metrics import Synthesisability
 import fcntl
 import argparse
 import setproctitle
+from retro_star.api import RSPlanner
 
 def lock(f):
     try:
@@ -36,10 +38,10 @@ def main(proc_id, filename, output_filename):
                 fcntl.flock(f, fcntl.LOCK_UN)
         if selected_mol is None:
             continue
-        try:
-            result = syn.planner.plan(selected_mol[1])
-        except:
-            result = None
+        # try:
+        result = syn.planner.plan(selected_mol[1])
+        # except:
+        #     result = None
 
         while(True):
             with open(output_filename, 'a') as f:
@@ -51,10 +53,11 @@ def main(proc_id, filename, output_filename):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='MCMC training')
+    import pdb; pdb.set_trace()
+    parser = argparse.ArgumentParser(description='retro* listener')
     parser.add_argument('--proc_id', type=int, default=1, help="process id")
-    parser.add_argument('--filename', type=str, default="generated_samples.txt", help="file name")
-    parser.add_argument('--output_filename', type=str, default="output_syn.txt", help="file name")
+    parser.add_argument('--filename', type=str, default="generated_samples.txt", help="file name to lister")
+    parser.add_argument('--output_filename', type=str, default="output_syn.txt", help="file name to output")
     args = parser.parse_args()
     setproctitle.setproctitle("retro_star_listener")
     main(args.proc_id, args.filename, args.output_filename)

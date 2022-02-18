@@ -30,9 +30,10 @@ class Synthesisability():
     def __init__(self):
         self.planner = RSPlanner(
                 gpu=-1,
+                starting_molecules='./retro_star/dataset/my_before_subm_origin_dict.csv',
                 use_value_fn=True,
-                iterations=10,
-                expansion_topk=50)
+                iterations=500,
+                expansion_topk=100)# 50)
 
     def get_syn_rate(self, mol_list):
         assert type(mol_list) == list

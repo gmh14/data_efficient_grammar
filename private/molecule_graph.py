@@ -98,7 +98,7 @@ class SubGraph(MolGraph):
         
 
 class InputGraph(MolGraph):
-    def __init__(self, mol, smiles, init_subgraphs, subgraphs_idx):
+    def __init__(self, mol, smiles, init_subgraphs, subgraphs_idx, GNN_model_path):
         '''
         init_subgraphs: a list of MolGraph
         subgraph_idx: a list of atom idx list for each subgraph
@@ -106,6 +106,7 @@ class InputGraph(MolGraph):
         super(InputGraph, self).__init__(mol)
         self.subgraphs = init_subgraphs
         self.subgraphs_idx = subgraphs_idx
+        self.GNN_model_path = GNN_model_path
         self.smiles = smiles
         self.map_to_set = self.get_map_to_set()
         self.NT_atoms = set()
@@ -129,7 +130,7 @@ class InputGraph(MolGraph):
 
     def get_nodes_feature(self, id):
         # dimension order, N * dim_f
-        self.feature_extractor = feature_extractor("./GCN/model_gin/supervised_contextpred.pth")
+        self.feature_extractor = feature_extractor(self.GNN_model_path)
         nodes_feature = self.feature_extractor.extract(self.mol)
         return nodes_feature[id]
         
@@ -147,7 +148,7 @@ class InputGraph(MolGraph):
         rst = len(set(subgraph_idx) & set(p_star_idx)) != 0
         if rst:
             union = list(set(subgraph_idx) | set(p_star_idx))
-        return rst, union   
+        return rst, union
 
     def set_water_level(self, node_list, edge_list, water_level):
         ext_node_list = []

@@ -126,7 +126,6 @@ dependencies:
     - markupsafe==2.0.1
     - matplotlib==3.3.4
     - mistune==0.8.4
-    - mlp-retrosyn==0.0.0
     - mypy-extensions==0.4.3
     - nbclient==0.5.9
     - nbconvert==6.0.7
@@ -156,7 +155,6 @@ dependencies:
     - pyzmq==22.3.0
     - qtconsole==5.2.1
     - qtpy==1.11.3
-    - rdchiral==0.0.0
     - rdflib==5.0.0
     - requests==2.26.0
     - send2trash==1.8.0
@@ -189,5 +187,5 @@ dependencies:
     - xarray==0.16.2
     - yacs==0.1.8
     - zipp==3.6.0
-prefix: ${HOME}/anaconda3/envs/DEG
+prefix: $CONDA_PREFIX
 

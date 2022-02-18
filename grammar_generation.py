@@ -10,7 +10,7 @@ from private import *
 from agent import sample
 
 
-def data_processing(input_smiles, motif=False):
+def data_processing(input_smiles, GNN_model_path, motif=False):
     input_mols = []
     input_graphs = []
     init_subgraphs = []
@@ -45,7 +45,7 @@ def data_processing(input_smiles, motif=False):
         
         init_subgraphs.append(subgraphs)
         subgraphs_idx.append(subgraphs_idx_i)
-        graph = InputGraph(mol, smiles, subgraphs, subgraphs_idx_i)
+        graph = InputGraph(mol, smiles, subgraphs, subgraphs_idx_i, GNN_model_path)
         input_graphs.append(graph)
         input_graphs_dict[MolKey(graph.mol)] = graph
 
@@ -61,18 +61,17 @@ def grammar_generation(agent, input_graphs_dict, subgraph_set, grammar, mcmc_ite
     # Terminating condition
     if len(plist) == 0:
         # done_flag, new_input_graphs_dict, new_subgraph_set, new_grammar
-        return True, [input_graphs_dict], [subgraph_set], [grammar]
+        return True, input_graphs_dict, subgraph_set, grammar
 
     # Update every InputGraph: remove every subgraph that equals to p_star, for those subgraphs that contain atom idx in p_star, replace the atom with p_star
     org_input_graphs_dict = deepcopy(input_graphs_dict)
     org_subgraph_set = deepcopy(subgraph_set)
     org_grammar = deepcopy(grammar)
-    new_grammar_list = []
-    new_input_graphs_dict = []
-    new_subgraph_set = []
+
     input_graphs_dict = deepcopy(org_input_graphs_dict)
     subgraph_set = deepcopy(org_subgraph_set)
     grammar = deepcopy(org_grammar)
+
     for i, (key, input_g) in enumerate(input_graphs_dict.items()):
         print("---for graph {}---".format(i))
         action_list = []
@@ -112,36 +111,26 @@ def grammar_generation(agent, input_graphs_dict, subgraph_set, grammar, mcmc_ite
                     
     # Update subgraph_set
     subgraph_set.update([g for (k, g) in input_graphs_dict.items()])
-    new_grammar_list.append(deepcopy(grammar))
-    new_input_graphs_dict.append(deepcopy(input_graphs_dict))
-    new_subgraph_set.append(deepcopy(subgraph_set))
-    return False, new_input_graphs_dict, new_subgraph_set, new_grammar_list
+    new_grammar = deepcopy(grammar)
+    new_input_graphs_dict = deepcopy(input_graphs_dict)
+    new_subgraph_set = deepcopy(subgraph_set)
+    return False, new_input_graphs_dict, new_subgraph_set, new_grammar
 
 
 def MCMC_sampling(agent, all_input_graphs_dict, all_subgraph_set, all_grammar, sample_number, args):
     iter_num = 0
     while(True):
         print("======MCMC iter{}======".format(iter_num))
-        new_all_input_graphs_dict = []
-        new_all_subgraph_set = []
-        new_all_grammar = []
-        new_done_flags = []
-        for idx, (_input_graphs_dict, _subgraph_set, _grammar) in enumerate(zip(all_input_graphs_dict, all_subgraph_set, all_grammar)):
-            # print("---------for current gramamr {}/{}-----------".format(idx+1, len(all_grammar)))
-            done_flag, new_input_graphs_dict, new_subgraph_set, new_grammar = grammar_generation(agent, _input_graphs_dict, _subgraph_set, _grammar, iter_num, sample_number, args)
-            new_all_input_graphs_dict.extend(new_input_graphs_dict)
-            new_all_subgraph_set.extend(new_subgraph_set)
-            new_all_grammar.extend(new_grammar)
-            new_done_flags.append(done_flag)
-        all_input_graphs_dict = deepcopy(new_all_input_graphs_dict)
-        all_subgraph_set = deepcopy(new_all_subgraph_set)
-        all_grammar = deepcopy(new_all_grammar)
-        print("Graph contraction status: ", new_done_flags)
-        if all(new_done_flags):
+        done_flag, new_input_graphs_dict, new_subgraph_set, new_grammar = grammar_generation(agent, all_input_graphs_dict, all_subgraph_set, all_grammar, iter_num, sample_number, args)
+        print("Graph contraction status: ", done_flag)
+        if done_flag:
             break
+        all_input_graphs_dict = deepcopy(new_input_graphs_dict)
+        all_subgraph_set = deepcopy(new_subgraph_set)
+        all_grammar = deepcopy(new_grammar)
         iter_num += 1
 
-    return iter_num, all_grammar, all_input_graphs_dict
+    return iter_num, new_grammar, new_input_graphs_dict
 
 
 def random_produce(grammar):

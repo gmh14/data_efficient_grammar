@@ -5,6 +5,7 @@ __pycache__/
 .ipynb_checkpoints/
 .git
 .DS_store
+./GCN/model_gin
 
 # Environments
 .env
