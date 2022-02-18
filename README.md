@@ -63,7 +63,7 @@ Since ``Retro*`` is a major bottleneck of the training speed, we separate it fro
 conda activate retro_star_env
 bash retro_star_listener.sh **num_processes**
 ```
->Note: opening multiple ``Retro*`` is EXTREMELY memory consuming. We suggest to start from using only one process by ``bash retro_star_listener.sh 1`` and monitor the memory usage, then accordingly increase the number to maximize the efficiency. We use ``35`` in the paper.
+>Note: opening multiple ``Retro*`` is EXTREMELY memory consuming (~5G each). We suggest to start from using only one process by ``bash retro_star_listener.sh 1`` and monitor the memory usage, then accordingly increase the number to maximize the efficiency. We use ``35`` in the paper.
 
 After finishing the training, to kill all the generated processes related to ``Retro*``, run
 ```bash
