@@ -8,10 +8,10 @@ __pycache__/
 .DS_store
 ./*/.DS_store
 ./*/*/.DS_store
-./retro_star/dataset/
-./retro_star/one_step_model/
-./retro_star/saved_models/
-./retro_star/retro_data.zip
+retro_star/dataset/
+retro_star/one_step_model/
+retro_star/saved_models/
+retro_star/retro_data.zip
 
 # Environments
 .env
