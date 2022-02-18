@@ -26,26 +26,6 @@ class InternalDiversity():
         return diversity
 
 
-class Synthesisability():
-    def __init__(self):
-        self.planner = RSPlanner(
-                gpu=-1,
-                starting_molecules='./retro_star/dataset/my_before_subm_origin_dict.csv',
-                use_value_fn=True,
-                iterations=500,
-                expansion_topk=100)# 50)
-
-    def get_syn_rate(self, mol_list):
-        assert type(mol_list) == list
-        syn_flag = []
-        for i, mol_sml in enumerate(mol_list):
-            result = self.planner.plan(Chem.MolToSmiles(mol_sml))
-            if result:
-                syn_flag.append(result['succ'])
-            else:
-                syn_flag.append(False)
-        return np.mean(syn_flag)
-
 if __name__ == "__main__":
     pass
 

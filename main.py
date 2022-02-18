@@ -178,7 +178,7 @@ if __name__ == '__main__':
     parser.add_argument('--training_data', type=str, default="./datasets/isocyanates.txt", help="file name of the training data")
     parser.add_argument('--GNN_model_path', type=str, default="./GCN/model_gin/supervised_contextpred.pth", help="file name of the pretrained GNN model")
     parser.add_argument('--hidden_size', type=int, default=128, help="hidden size of the potential function")
-    parser.add_argument('--max_epoches', type=int, default=20, help="maximal training epoches")
+    parser.add_argument('--max_epoches', type=int, default=50, help="maximal training epoches")
     parser.add_argument('--num_generated_samples', type=int, default=100, help="number of generated samples to evaluate grammar")
     parser.add_argument('--MCMC_size', type=int, default=5, help="sample number of each step of MCMC")
     parser.add_argument('--learning_rate', type=int, default=1e-2, help="learning rate")

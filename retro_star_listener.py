@@ -1,11 +1,12 @@
 import torch
 import torch.multiprocessing as mp
 import numpy as np
-from private.metrics import Synthesisability
 import fcntl
 import argparse
 import setproctitle
 from retro_star.api import RSPlanner
+from rdkit import Chem
+
 
 def lock(f):
     try:
@@ -13,6 +14,27 @@ def lock(f):
     except IOError:
         return False
     return True
+
+
+class Synthesisability():
+    def __init__(self):
+        self.planner = RSPlanner(
+                gpu=-1,
+                starting_molecules='./retro_star/dataset/origin_dict.csv',
+                use_value_fn=True,
+                iterations=10,
+                expansion_topk=50)
+
+    def get_syn_rate(self, mol_list):
+        assert type(mol_list) == list
+        syn_flag = []
+        for i, mol_sml in enumerate(mol_list):
+            result = self.planner.plan(Chem.MolToSmiles(mol_sml))
+            if result:
+                syn_flag.append(result['succ'])
+            else:
+                syn_flag.append(False)
+        return np.mean(syn_flag)
 
 
 def main(proc_id, filename, output_filename):
@@ -53,7 +75,6 @@ def main(proc_id, filename, output_filename):
 
 
 if __name__ == "__main__":
-    import pdb; pdb.set_trace()
     parser = argparse.ArgumentParser(description='retro* listener')
     parser.add_argument('--proc_id', type=int, default=1, help="process id")
     parser.add_argument('--filename', type=str, default="generated_samples.txt", help="file name to lister")
