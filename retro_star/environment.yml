@@ -14,7 +14,6 @@ dependencies:
   - rdkit
   - tqdm
   - networkx
-  - setproctitle
   - graphviz
   - python-graphviz
 prefix: $CONDA_PREFIX
