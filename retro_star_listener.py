@@ -63,7 +63,10 @@ def main(proc_id, filename, output_filename):
             continue
 
         print("====Working for sample {}/{}====".format(selected_mol[0], num_samples))
-        result = syn.planner.plan(selected_mol[1])
+        try:
+            result = syn.planner.plan(selected_mol[1])
+        except:
+            result = None
 
         while(True):
             with open(output_filename, 'a') as f:
