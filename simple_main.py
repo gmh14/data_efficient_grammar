@@ -143,15 +143,6 @@ def learn(smiles_list, args):
                     pickle.dump(l_input_graphs_dict, outp, pickle.HIGHEST_PROTOCOL)
                 curr_max_R = R_ind
         
-        eval_metrics = {}
-        for r in log_returns:
-            for _key in r.keys():
-                if _key not in eval_metrics:
-                    eval_metrics[_key] = []
-                eval_metrics[_key].append(r[_key])
-        mean_evaluation_metrics = ["{}: {}".format(_key, np.mean(eval_metrics[_key])) for _key in eval_metrics]
-        logger.info("Mean evaluation metrics: {}".format(', '.join(mean_evaluation_metrics)))
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MCMC training')
