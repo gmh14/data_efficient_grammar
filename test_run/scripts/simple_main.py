@@ -16,7 +16,6 @@ import pickle
 import argparse
 import fcntl
 from retro_star_listener import lock
-import pdb
 
 
 def evaluate(grammar, args, metrics=['diversity', 'syn']):
@@ -110,7 +109,6 @@ def learn(smiles_list, args):
         assert  os.path.exists(args.resume_path), "Please provide valid path for resuming."
         ckpt = torch.load(args.resume_path)
         agent.load_state_dict(ckpt)
-    optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate)
 
     # Start training
     logger.info('starting\n')
@@ -145,44 +143,15 @@ def learn(smiles_list, args):
                     pickle.dump(l_input_graphs_dict, outp, pickle.HIGHEST_PROTOCOL)
                 curr_max_R = R_ind
         
-        # Calculate loss
-        returns = torch.tensor(returns)
-        returns = (returns - returns.mean()) # / (returns.std() + eps)
-        assert len(returns) == len(list(agent.saved_log_probs.keys()))
-        policy_loss = torch.tensor([0.])
-        for sample_number in agent.saved_log_probs.keys():
-            max_iter_num = max(list(agent.saved_log_probs[sample_number].keys()))
-            for iter_num_key in agent.saved_log_probs[sample_number].keys():
-                log_probs = agent.saved_log_probs[sample_number][iter_num_key]
-                for log_prob in log_probs:
-                    policy_loss += (-log_prob * args.gammar ** (max_iter_num - iter_num_key) * returns[sample_number]).sum()
-
-        # Back Propogation and update
-        optimizer.zero_grad()
-        policy_loss.backward()
-        optimizer.step()
-        agent.saved_log_probs.clear()
-
-        # Log
-        logger.info("Loss: {}".format(policy_loss.clone().item()))
-        eval_metrics = {}
-        for r in log_returns:
-            for _key in r.keys():
-                if _key not in eval_metrics:
-                    eval_metrics[_key] = []
-                eval_metrics[_key].append(r[_key])
-        mean_evaluation_metrics = ["{}: {}".format(_key, np.mean(eval_metrics[_key])) for _key in eval_metrics]
-        logger.info("Mean evaluation metrics: {}".format(', '.join(mean_evaluation_metrics)))
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MCMC training')
     parser.add_argument('--training_data', type=str, default="./datasets/isocyanates.txt", help="file name of the training data")
     parser.add_argument('--GNN_model_path', type=str, default="./GCN/model_gin/supervised_contextpred.pth", help="file name of the pretrained GNN model")
     parser.add_argument('--hidden_size', type=int, default=128, help="hidden size of the potential function")
-    parser.add_argument('--max_epoches', type=int, default=50, help="maximal training epoches")
+    parser.add_argument('--max_epoches', type=int, default=1, help="maximal training epoches")
     parser.add_argument('--num_generated_samples', type=int, default=100, help="number of generated samples to evaluate grammar")
-    parser.add_argument('--MCMC_size', type=int, default=5, help="sample number of each step of MCMC")
+    parser.add_argument('--MCMC_size', type=int, default=1, help="sample number of each step of MCMC")
     parser.add_argument('--learning_rate', type=int, default=1e-2, help="learning rate")
     parser.add_argument('--gammar', type=float, default=0.99, help="discount factor")
     parser.add_argument('--motif', action="store_true", default=False, help="use motif as the basic building block for polymer dataset")
@@ -198,7 +167,7 @@ if __name__ == '__main__':
     with open(args.training_data, 'r') as fr:
         lines = fr.readlines()
         mol_sml = []
-        for line in lines[:20]:
+        for line in lines:
             if not (line.strip() in mol_sml):
                 mol_sml.append(line.strip())
 

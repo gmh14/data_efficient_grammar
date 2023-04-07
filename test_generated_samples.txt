@@ -1,0 +1,5 @@
+CN(C)C(O)c1c2c(cn1C)C(=O)C(C)(C)C2=O working
+COc1c2c(cn1C)C(=O)C(C)(C)C2=O working
+CNc1c2c(cn1C)C(=O)C(C)(C)C2=O working
+C#Cc1c2c(cn1C)C(=O)C(C)(C)C2=O working
+Cn1cc2c(c1C(F)F)C(=O)C(C)(C)C2=O working

@@ -68,6 +68,7 @@ def retro_sender(generated_samples, args):
     with open(args.receiver_file, 'w') as fw:
         fw.write('')
     while(True):
+        pdb.set_trace()
         with open(args.sender_file, 'r') as fr:
             editable = lock(fr)
             if editable:

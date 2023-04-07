@@ -1,0 +1,13 @@
+[2023-04-06 19:14:52,464][        main.py][line: 104][    INFO] args:Namespace(GNN_model_path='./GCN/model_gin/supervised_contextpred.pth', MCMC_size=2, gammar=0.99, hidden_size=128, learning_rate=0.01, max_epoches=2, motif=True, num_generated_samples=5, receiver_file='output_syn.txt', resume=False, resume_path='', sender_file='generated_samples.txt', training_data='./datasets/polymers_117.txt')
+[2023-04-06 19:14:53,217][        main.py][line: 117][    INFO] starting
+
+[2023-04-06 19:14:53,217][        main.py][line: 122][    INFO] <<<<< Epoch 0/2 >>>>>>
+[2023-04-07 11:53:40,897][        main.py][line: 133][    INFO] eval_metrics: {'diversity': 0.5135737990468568, 'syn': 0.0}
+[2023-04-07 11:53:40,898][        main.py][line: 139][    INFO] ======Sample 0 returns 0.5135737990468568=======:
+[2023-04-07 11:56:17,771][        main.py][line: 133][    INFO] eval_metrics: {'diversity': 0.7066529555645914, 'syn': 0.0}
+[2023-04-07 11:56:17,771][        main.py][line: 139][    INFO] ======Sample 1 returns 0.7066529555645914=======:
+[2023-04-07 11:56:17,986][        main.py][line: 168][    INFO] Loss: -1.4232254028320312
+[2023-04-07 11:56:17,986][        main.py][line: 176][    INFO] Mean evaluation metrics: diversity: 0.6101133773057241, syn: 0.0
+[2023-04-07 11:56:17,986][        main.py][line: 122][    INFO] <<<<< Epoch 1/2 >>>>>>
+[2023-04-07 11:59:03,646][        main.py][line: 133][    INFO] eval_metrics: {'diversity': 0.557335879806468, 'syn': 0.8}
+[2023-04-07 11:59:03,647][        main.py][line: 139][    INFO] ======Sample 0 returns 2.1573358798064683=======:
