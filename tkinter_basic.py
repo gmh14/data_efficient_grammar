@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import NW, LEFT, RIGHT, VERTICAL, FALSE, TRUE, BOTH, Y
 import pdb
 import os
 
@@ -13,13 +14,15 @@ from os import listdir
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--polymer_log",help="dir for polymer log of grammar chkpt")
+parser.add_argument("--polymer_log", required=True, help="dir for polymer log of grammar chkpt")
+parser.add_argument("--zoom", default=1., type=float, required=False, help="zoom in for each mol img")
 parser.add_argument("--iso_log")
 parser.add_argument("--acy_log")
 parser.add_argument("--chain_extender_log")
 args = parser.parse_args()
 
-    
+
+  
 window = tk.Tk()
 expr_name_dict = dict()
 expr_name_dict['polymer_117motif'] = args.polymer_log # 'test_run'
@@ -61,23 +64,45 @@ def handle_click(i,correct_mols):
     correct_mols.add(i)
     print(f"{i} is correct")
 
+root_frame = tk.Frame(master=window, relief=tk.RAISED, borderwidth=1)
+# scrollbar = tk.Scrollbar(window,orient='vertical')
+# scrollbar.config(command=root_frame.yview)
+root_frame.pack()
+
+my_canvas = tk.Canvas(root_frame)
+my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+my_scrollbar = tk.Scrollbar(root_frame, orient=VERTICAL, command=my_canvas.yview)
+my_scrollbar.pack(side=RIGHT, fill=Y)
+
+my_canvas.configure(yscrollcommand=my_scrollbar.set)
+my_canvas.bind(
+    '<Configure>', lambda e: my_canvas.configure(scrollregion=my_canvas.bbox("all"))
+)
+
+canvas_frame = tk.Frame(master=my_canvas)
+my_canvas.create_window((0, 0), window=canvas_frame, anchor="nw")
+
 for i in range(len(generated_mols[exp])):
     path = dirname + f"mol{i}.png"  
-    pic = Chem.Draw.MolsToImage([generated_mols[exp][i]], molsPerRow=1, subImgSize=(50,50))
+    pic = Chem.Draw.MolsToImage([generated_mols[exp][i]], molsPerRow=1, subImgSize=(100,100))
     pic.save(path)
 
-    frame = tk.Frame(master=window, relief=tk.RAISED, borderwidth=1)
+    # frame for each molecule
+    frame = tk.Frame(master=canvas_frame, relief=tk.RAISED, borderwidth=1) 
     frame.grid(row=i,column=0)
 
     mol_img = Image.open(path)
-    mol_pic = ImageTk.PhotoImage(mol_img.resize((int(x) for x in mol_img.size)))
+    mol_pic = ImageTk.PhotoImage(mol_img.resize((int(args.zoom*x) for x in mol_img.size)))
+
+    # add img to frame
     lab = tk.Label(master=frame, image=mol_pic)
     lab.image = mol_pic
     lab.pack()
 
     correct_mols = set()
     button = tk.Button(
-        master=frame,
+        master=frame, # add button to frame
         text=f"Correct {i}",
         width=25,
         height=5,
