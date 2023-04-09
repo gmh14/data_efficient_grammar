@@ -54,24 +54,30 @@ for expr_name in expr_names:
 # TODO: loop over exps
 exp = 'polymer_117motif' # 'iso', 'acrylates', 'chain_extender'
 dirname = f"./demo/{exp}/"
-greeting = tk.Label(text="Hello, Tkinter")
-greeting.pack()
 os.makedirs(dirname,exist_ok=True)
 
-path = dirname + f"mol{i}.png"    
-pic = Chem.Draw.MolsToImage(generated_mols[exp], molsPerRow=1, subImgSize=(200,200))
-pic.save(path)
-mol_pic = ImageTk.PhotoImage(Image.open(path))
-lab = tk.Label(image=mol_pic)
-labimage = mol_pic
-lab.pack()
-correct_mols = set()
+
 def handle_click(i,correct_mols):
     correct_mols.add(i)
     print(f"{i} is correct")
 
 for i in range(len(generated_mols[exp])):
+    path = dirname + f"mol{i}.png"  
+    pic = Chem.Draw.MolsToImage([generated_mols[exp][i]], molsPerRow=1, subImgSize=(50,50))
+    pic.save(path)
+
+    frame = tk.Frame(master=window, relief=tk.RAISED, borderwidth=1)
+    frame.grid(row=i,column=0)
+
+    mol_img = Image.open(path)
+    mol_pic = ImageTk.PhotoImage(mol_img.resize((int(x) for x in mol_img.size)))
+    lab = tk.Label(master=frame, image=mol_pic)
+    lab.image = mol_pic
+    lab.pack()
+
+    correct_mols = set()
     button = tk.Button(
+        master=frame,
         text=f"Correct {i}",
         width=25,
         height=5,
