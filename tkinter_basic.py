@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import NW, LEFT, RIGHT, VERTICAL, FALSE, TRUE, BOTH, Y
+from tkinter import NW, LEFT, RIGHT, TOP, VERTICAL, HORIZONTAL, FALSE, TRUE, BOTH, Y, X
 import pdb
 import os
 
@@ -69,13 +69,15 @@ root_frame = tk.Frame(master=window, relief=tk.RAISED, borderwidth=1)
 # scrollbar.config(command=root_frame.yview)
 root_frame.pack()
 
-my_canvas = tk.Canvas(root_frame)
+my_canvas = tk.Canvas(root_frame,width=1000,height=1000)
 my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-my_scrollbar = tk.Scrollbar(root_frame, orient=VERTICAL, command=my_canvas.yview)
-my_scrollbar.pack(side=RIGHT, fill=Y)
+my_scrollbar_v = tk.Scrollbar(root_frame, orient=VERTICAL, command=my_canvas.yview)
+# my_scrollbar_h = tk.Scrollbar(root_frame, orient=HORIZONTAL, command=my_canvas.xview)
+my_scrollbar_v.pack(side=RIGHT, fill=Y)
+# my_scrollbar_h.pack(side=TOP, fill=X)
 
-my_canvas.configure(yscrollcommand=my_scrollbar.set)
+my_canvas.configure(yscrollcommand=my_scrollbar_v.set)
 my_canvas.bind(
     '<Configure>', lambda e: my_canvas.configure(scrollregion=my_canvas.bbox("all"))
 )
@@ -85,7 +87,7 @@ my_canvas.create_window((0, 0), window=canvas_frame, anchor="nw")
 
 for i in range(len(generated_mols[exp])):
     path = dirname + f"mol{i}.png"  
-    pic = Chem.Draw.MolsToImage([generated_mols[exp][i]], molsPerRow=1, subImgSize=(100,100))
+    pic = Chem.Draw.MolsToImage([generated_mols[exp][i]], molsPerRow=1, subImgSize=(400,400))
     pic.save(path)
 
     # frame for each molecule
@@ -104,7 +106,7 @@ for i in range(len(generated_mols[exp])):
     button = tk.Button(
         master=frame, # add button to frame
         text=f"Correct {i}",
-        width=25,
+        width=100,
         height=5,
         bg="blue",
         fg="yellow",
