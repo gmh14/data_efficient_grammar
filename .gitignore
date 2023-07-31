@@ -19,3 +19,5 @@ retro_star/retro_data.zip
 # Environments
 .env
 .venv
+demo/
+

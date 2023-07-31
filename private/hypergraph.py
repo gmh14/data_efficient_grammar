@@ -771,12 +771,15 @@ def hg_to_mol(hg, verbose=False):
     atom_dict = {}
     bond_set = set([])
     for each_edge in hg.edges:
-        atom = Chem.Atom(hg.edge_attr(each_edge)['symbol'].symbol)
-        atom.SetNumExplicitHs(hg.edge_attr(each_edge)['symbol'].num_explicit_Hs)
-        atom.SetFormalCharge(hg.edge_attr(each_edge)['symbol'].formal_charge)
-        atom.SetChiralTag(
-            Chem.rdchem.ChiralType.values[
-                hg.edge_attr(each_edge)['symbol'].chirality])
+        if hg.edge_attr(each_edge)['symbol'].symbol == 'R':
+            atom = Chem.Atom('*')
+        else:
+            atom = Chem.Atom(hg.edge_attr(each_edge)['symbol'].symbol)
+            atom.SetNumExplicitHs(hg.edge_attr(each_edge)['symbol'].num_explicit_Hs)
+            atom.SetFormalCharge(hg.edge_attr(each_edge)['symbol'].formal_charge)
+            atom.SetChiralTag(
+                Chem.rdchem.ChiralType.values[
+                    hg.edge_attr(each_edge)['symbol'].chirality])
         atom_idx = mol.AddAtom(atom)
         atom_dict[each_edge] = atom_idx
 

@@ -157,6 +157,7 @@ def random_produce(grammar):
     hypergraph = Hypergraph()
     starting_rules = [(rule_i, rule) for rule_i, rule in enumerate(grammar.prod_rule_list) if rule.is_start_rule]
     iter = 0
+    mol_gen_seq = []
     while(True):
         if iter == 0:
             _, idx = sample(starting_rules)
@@ -179,6 +180,7 @@ def random_produce(grammar):
             prob_list = prob_schedule(iter, candidate_rule_idx)
             hypergraph, idx = sample(candidate_hg, prob_list)
             selected_rule = candidate_rule_idx[idx]
+        mol_gen_seq.append(hg_to_mol(hypergraph))
         iter += 1
     try:
         mol = hg_to_mol(hypergraph)
@@ -186,4 +188,4 @@ def random_produce(grammar):
     except:
         return None, iter
 
-    return mol, iter
+    return mol, iter, mol_gen_seq
