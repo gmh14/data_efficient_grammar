@@ -2,7 +2,7 @@
 from grammar_generation import random_produce
 from UI_utils.local_file_picker  import local_file_picker
 from UI_utils.grammar_gen import generate_mols
-from UI_utils.path_pages import *
+# from UI_utils.path_pages import *
 
 from nicegui import ui
 from nicegui.events import ValueChangeEventArguments
@@ -11,8 +11,9 @@ from nicegui.events import MouseEventArguments
 from rdkit import Chem
 from rdkit.Chem import Draw
 import numpy as np
-
+import time
 import os
+from time import sleep
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -68,7 +69,7 @@ def new_samples_click():
     ui.notify(f'generating new samples...')
     mol_sml_list, mol_img_list, mol_gen_seq_list = generate_mols(8, args.polymer_log, local_dirname)
     for i in range(len(shown_images)):
-        shown_images[i].source = '{}/{}'.format(dirname, mol_img_list[i])
+        shown_images[i].source = '{}/{}?time={}'.format(dirname, mol_img_list[i], time.time())
         ui.update(shown_images[i])
         shown_images[i].update()
         radios[i].value = None
