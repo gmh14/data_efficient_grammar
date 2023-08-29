@@ -23,7 +23,7 @@ def generate_mols(num_mol, log_dir, save_path, img_size=100):
     generated_mols = []
     all_seq_list = []
     for i in range(num_mol):
-        mol, _, mol_gen_seq = random_produce(grammar)
+        mol, _, mol_gen_seq = random_produce(grammar, gen_seq=True)
         generated_mols.append(mol)
         all_seq_list.append(mol_gen_seq)
 
@@ -31,6 +31,8 @@ def generate_mols(num_mol, log_dir, save_path, img_size=100):
     mol_sml_list = []
     mol_gen_seq_list = []
     for i, mol in enumerate(generated_mols):
+        for fname in os.listdir(save_path + f'mol{i}_gen/'):
+            os.remove(save_path + f'mol{i}_gen/' + fname)
         local_path = save_path + f'mol{i}.svg'
         pic = Chem.Draw.MolsToGridImage([mol], molsPerRow=1, subImgSize=(100,100), useSVG=True)
         with open(local_path, 'w') as f_handle:
@@ -49,5 +51,12 @@ def generate_mols(num_mol, log_dir, save_path, img_size=100):
         mol_img_list.append(local_path)
         mol_sml_list.append(Chem.MolToSmiles(mol))
         mol_gen_seq_list.append(gen_seq)
+    
+    smi_path = save_path + 'gen_mol/'
+    os.makedirs(smi_path, exist_ok=True)
+    for i, sml in enumerate(mol_sml_list):
+        with open(smi_path + f"{i}.smi", 'w+') as f:
+            f.write(f"{sml}\n")
+
 
     return mol_sml_list, mol_img_list, mol_gen_seq_list

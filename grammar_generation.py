@@ -133,7 +133,7 @@ def MCMC_sampling(agent, all_input_graphs_dict, all_subgraph_set, all_grammar, s
     return iter_num, new_grammar, new_input_graphs_dict
 
 
-def random_produce(grammar):
+def random_produce(grammar, gen_seq=False):
     def sample(l, prob=None):
         if prob is None:
             prob = [1/len(l)] * len(l)
@@ -188,4 +188,7 @@ def random_produce(grammar):
     except:
         return None, iter
 
-    return mol, iter, mol_gen_seq
+    if gen_seq:
+        return mol, iter, mol_gen_seq
+    else:
+        return mol, iter
